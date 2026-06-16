@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>task</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div id="custom-alert" class="hidden">
+    <span id="custom-alert-text"></span>
+</div>
+
+    <div id="app"></div>
+
+    <template id="registration">
+        <div class="page">
+            <h2>registration</h2>
+            <form id="registration-form">
+                <div>
+                    <label for="reg-username">user name</label>
+                    <input type="text" id="reg-username" name="reg-username" required>
+                </div>
+                <div>
+                    <label for="reg-email">email</label>
+                    <input type="email" id="reg-email" name="reg-email" required>
+                </div>
+                <button type="submit">submit</button>
+                <button type="button" id="go-to-login-btn">go to login</button>
+            </form>
+        </div>
+    </template>
+
+    <template id="login">
+        <div class="page">
+            <h2>login</h2>
+            <form id="login-form">
+                <div>
+                    <label for="login-username">user name</label>
+                    <input type="text" id="login-username" name="login-username" required>
+                </div>
+                <div>
+                    <label for="login-email">email</label>
+                    <input type="email" id="login-email" name="login-email" required>
+                </div>
+                <button type="submit">submit</button>
+                <button type="button" id="go-to-reg-btn">go to registration</button>
+            </form>
+        </div>
+    </template>
+
+    <template id="task-template">
+        <div class="page">
+            <h2>Application Page</h2>
+            
+            <div>
+                <input type="text" id="search-input" placeholder="Search...">
+                <button type="button" id="search-btn">Search</button>
+                <button type="button" id="add-btn">Add New Item</button>
+            </div>
+            
+            <div id="items-list">
+                </div>
+
+            <button type="button" id="logout-btn">Logout</button>
+        </div>
+    </template>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
