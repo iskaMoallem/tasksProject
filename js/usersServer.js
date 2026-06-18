@@ -27,7 +27,8 @@ class UserServer {
         });
     }
 
-    _register(body) {
+    _register(body) 
+    {
         const { id, userName, password } = body;
         if (!id || !userName || !password) {
             return JSON.stringify({ status: 400, message: "ID, Username and password are required" });

@@ -3,7 +3,7 @@ class Fugitive {
         this.id = id;
         this.name = name;
         this.description = description || " ";
-        this.status = "";
+        this.status = status;
         this.riskLevel = riskLevel;
         this.relatedOfficerIds = [creatorOfficerId];
     }

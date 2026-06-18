@@ -4,48 +4,56 @@ class Network {
         this.fugitiveServer = new FugitiveServer();
     }
 
+    _getRandomDelay() {
+        return Math.floor(Math.random() * 501) + 500;
+    }
+
     _isNetworkDown() {
         return Math.random() < 0.1;
     }
 
-    _simulateNetworkFailure(reject) {
+    _handleNetworkDrop(xhrObject, delay) {
         setTimeout(() => {
-            reject({ status: 503, message: "Network error: No internet connection or server not responding" });
-        }, 1000);
+            xhrObject.status = 503;
+            xhrObject.responseText = JSON.stringify({ message: "Network error: Request dropped" });
+            xhrObject.onerror();
+        }, delay);
     }
 
-    _routeRequest(requestObject, stringifiedRequest) {
-        if (requestObject.endPoint && requestObject.endPoint.startsWith('/api/users')) {
-            return this.userServer.handleRequest(stringifiedRequest);
+    _processValidRequest(xhrObject, delay) {
+        setTimeout(() => {
+            const stringifiedResponse = this._routeRequest(xhrObject);
+            const finalResponse = JSON.parse(stringifiedResponse);
+            xhrObject.status = finalResponse.status;
+            xhrObject.responseText = stringifiedResponse;
+                xhrObject.onload();
+        }, delay);
+    }
+
+    _routeRequest(xhrObject) {
+        const requestString = JSON.stringify({
+            method: xhrObject.method,
+            endPoint: xhrObject.endPoint,
+            body: xhrObject.body
+        });
+
+        if (xhrObject.endPoint.startsWith('/api/users')) {
+            return this.userServer.handleRequest(requestString);
         }
-        if (requestObject.endPoint && requestObject.endPoint.startsWith('/api/fugitive')) {
-            return this.fugitiveServer.handleRequest(stringifiedRequest);
+        if (xhrObject.endPoint.startsWith('/api/fugitives')) {
+            return this.fugitiveServer.handleRequest(requestString);
         }
         return JSON.stringify({ status: 404, message: "Server not found" });
     }
 
-    _processResponse(stringifiedResponse, resolve, reject) {
-        const finalResponse = JSON.parse(stringifiedResponse);
-        if (finalResponse.status >= 200 && finalResponse.status < 300) {
-            resolve(finalResponse);
-        }
-        else {
-            reject(finalResponse);
+    sendRequest(xhrObject) {
+        const delay = this._getRandomDelay();
+        if (this._isNetworkDown()) {
+            this._handleNetworkDrop(xhrObject, delay);
+        } else {
+            this._processValidRequest(xhrObject, delay);
         }
     }
-
-    sendRequest(requestObject) {
-        return new Promise((resolve, reject) => {
-            if (this._isNetworkDown()) {
-                return this._simulateNetworkFailure(reject);
-            }
-
-            const stringifiedRequest = JSON.stringify(requestObject);
-            setTimeout(() => {
-                const stringifiedResponse = this._routeRequest(requestObject, stringifiedRequest);
-                this._processResponse(stringifiedResponse, resolve, reject);
-            }, 1000);
-        });
-    }
-
 }
+
+const network = new Network();
