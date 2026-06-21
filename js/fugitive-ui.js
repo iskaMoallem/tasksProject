@@ -2,17 +2,41 @@ class FugitiveUI {
     constructor() {
         this.fugitivesList = [];
         this._bindEvents();
+        this.editingId = null;
     }
-
     _applyFilters() {
         const searchText = document.getElementById('search-input').value.toLowerCase();
         const statusValue = document.getElementById('filter-status-select').value;
+        const riskValue = document.getElementById('filter-risk-select').value;
+        const myFugitivesOnly = document.getElementById('filter-my-fugitives').checked;
+        const loggedInUser = JSON.parse(sessionStorage.getItem('currentUser'));
         const filteredList = this.fugitivesList.filter(fugitive => {
             const matchesName = fugitive.name.toLowerCase().includes(searchText);
             const matchesStatus = (statusValue === 'All') || (fugitive.status === statusValue);
-            return matchesName && matchesStatus;
+            const matchesRisk = (riskValue === 'All') || (fugitive.riskLevel === riskValue);
+            let matchesOfficer = true;
+            if (myFugitivesOnly && loggedInUser) {
+                matchesOfficer = fugitive.relatedOfficerIds && fugitive.relatedOfficerIds.includes(loggedInUser.id);
+            }
+            return matchesName && matchesStatus && matchesRisk && matchesOfficer;
         });
+
         this._renderTable(filteredList);
+    }
+
+    _bindEvents() {
+        const searchInput = document.getElementById('search-input');
+        const filterStatus = document.getElementById('filter-status-select');
+        const filterRisk = document.getElementById('filter-risk-select');
+        const filterMyFugitives = document.getElementById('filter-my-fugitives');
+        const addFugitiveBtn = document.getElementById('add-fugitive-btn');
+
+        if (searchInput) searchInput.addEventListener('input', () => this._applyFilters());
+        if (filterStatus) filterStatus.addEventListener('change', () => this._applyFilters());
+        if (filterRisk) filterRisk.addEventListener('change', () => this._applyFilters());
+        if (filterMyFugitives) filterMyFugitives.addEventListener('change', () => this._applyFilters());
+
+        if (addFugitiveBtn) addFugitiveBtn.addEventListener('click', () => this.handleAddFugitive());
     }
 
     _getNewFugitiveInputs() {
@@ -48,6 +72,34 @@ class FugitiveUI {
         xhr.onerror = () => alert("Network Error while adding fugitive.");
         xhr.send(newData);
     }
+    _sendUpdateRequest(updatedData) {
+        const xhr = new FXMLHttpRequest();
+        xhr.open('PUT', '/api/fugitives/update');
+
+        xhr.onload = () => {
+            if (xhr.status === 200) {
+                const index = this.fugitivesList.findIndex(f => f.id === updatedData.id);
+                if (index !== -1) {
+                    this.fugitivesList[index] = updatedData;
+                }
+                this._applyFilters();
+                this._resetFormState();
+                alert("Fugitive updated successfully.");
+            } else {
+                const response = JSON.parse(xhr.responseText);
+                alert("Failed to update: " + response.message);
+            }
+        };
+        xhr.onerror = () => alert("Network Error while updating.");
+        xhr.send(updatedData);
+    }
+
+    _resetFormState() {
+        this._clearAddForm();
+        document.getElementById('fugitive-id').disabled = false;
+        this.editingId = null;
+        document.getElementById('add-fugitive-btn').innerText = "Add Fugitive";
+    }
 
     handleAddFugitive() {
         const newData = this._getNewFugitiveInputs();
@@ -55,28 +107,23 @@ class FugitiveUI {
             alert("Error: Fugitive ID and Name are required.");
             return;
         }
-        const loggedInUser = JSON.parse(sessionStorage.getItem('currentUser'));
-        if (loggedInUser) {
-            newData.creatorOfficerId = loggedInUser.id;
+        if (this.editingId) {
+            const oldFugitive = this.fugitivesList.find(f => f.id === this.editingId);
+            if (oldFugitive && oldFugitive.status === 'Deceased' && newData.status !== 'Deceased') {
+                alert("Error: A deceased fugitive cannot be brought back to active status.");
+                return;
+            }
+
+            newData.relatedOfficerIds = oldFugitive.relatedOfficerIds;
+            this._sendUpdateRequest(newData);
+
+        } else {
+            const loggedInUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (loggedInUser) newData.creatorOfficerId = loggedInUser.id;
+            this._sendAddRequest(newData);
         }
-        this._sendAddRequest(newData);
     }
 
-    _bindEvents() {
-        const searchInput = document.getElementById('search-input');
-        const filterStatus = document.getElementById('filter-status-select');
-        const addFugitiveBtn = document.getElementById('add-fugitive-btn');
-
-        if (searchInput) {
-            searchInput.addEventListener('input', () => this._applyFilters());
-        }
-        if (filterStatus) {
-            filterStatus.addEventListener('change', () => this._applyFilters());
-        }
-        if (addFugitiveBtn) {
-            addFugitiveBtn.addEventListener('click', () => this.handleAddFugitive());
-        }
-    }
 
     loadAllFugitives() {
         const xhr = new FXMLHttpRequest();
@@ -141,28 +188,17 @@ class FugitiveUI {
     }
 
     handleUpdate(fugitiveId) {
-        const fugitiveToUpdate = this.fugitivesList.find(f => f.id === fugitiveId);
-        if (!fugitiveToUpdate) return;
-        const newStatus = prompt("Update status for " + fugitiveToUpdate.name + ":\n(Type: At Large / In Custody / Deceased)", fugitiveToUpdate.status);
-        if (!newStatus || newStatus === fugitiveToUpdate.status) return;
-
-        const updatedFugitive = { ...fugitiveToUpdate, status: newStatus };
-        const xhr = new FXMLHttpRequest();
-        xhr.open('PUT', '/api/fugitives/update');
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                const index = this.fugitivesList.findIndex(f => f.id === fugitiveId);
-                if (index !== -1) {
-                    this.fugitivesList[index] = updatedFugitive;
-                }
-                this._applyFilters();
-            } else {
-                const response = JSON.parse(xhr.responseText);
-                alert("Failed to update: " + response.message);
-            }
-        };
-        xhr.onerror = () => alert("Network Error while updating.");
-        xhr.send(updatedFugitive);
+        const fugitive = this.fugitivesList.find(f => f.id === fugitiveId);
+        if (!fugitive) return;
+        document.getElementById('fugitive-id').value = fugitive.id;
+        document.getElementById('fugitive-id').disabled = true;
+        document.getElementById('fugitive-name').value = fugitive.name;
+        document.getElementById('fugitive-risk').value = fugitive.riskLevel;
+        document.getElementById('fugitive-status').value = fugitive.status;
+        document.getElementById('fugitive-desc').value = fugitive.description;
+        this.editingId = fugitive.id;
+        document.getElementById('add-fugitive-btn').innerText = "Save Changes";
+        window.scrollTo(0, 0);
     }
 }
 

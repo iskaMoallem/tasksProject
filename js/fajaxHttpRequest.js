@@ -3,10 +3,8 @@ class FXMLHttpRequest {
         this.method = '';
         this.endPoint = '';
         this.body = null;
-
         this.status = null;
         this.responseText = null;
-
         this.onload = null;
         this.onerror = null;
     }

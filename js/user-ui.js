@@ -94,17 +94,17 @@ class UserUI {
         xhr.send(data);
     }
 
-    _processSuccessfulRegistration() {
+    _processSuccessfulRegistration(userData) {
         this._clearInputs(['reg-id', 'reg-name', 'reg-pass']);
-        alert("Registration successful! You can now login.");
-        router.navigateTo('#login');
+        alert("Registration successful!");
+        sessionStorage.setItem('currentUser', JSON.stringify(userData));
+        router.navigateTo('#dashboard');
     }
 
     _onRegisterResponse(xhr) {
         const response = JSON.parse(xhr.responseText);
-
         if (xhr.status === 201) {
-            this._processSuccessfulRegistration();
+            this._processSuccessfulRegistration(response.data);
         } else {
             alert("Registration Failed: " + response.message);
         }
@@ -118,5 +118,5 @@ class UserUI {
         this._sendRegisterRequest(data);
     }
 
-}   
- const userUI = new UserUI();
+}
+const userUI = new UserUI();

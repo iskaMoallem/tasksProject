@@ -1,361 +1,475 @@
-/* ==========================================================================
-   1. משתני עיצוב (CSS Variables) - פלטת צבעים טקטית ומודרנית
-   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
 :root {
-    --bg-main: #0f172a;           /* כחול-סלייט כהה מאוד (רקע כללי) */
-    --bg-card: #1e293b;           /* רקע כרטיסים ומסכים */
-    --bg-input: #334155;          /* רקע שדות קלט */
-    --text-main: #f8fafc;         /* טקסט בהיר ראשי */
-    --text-muted: #94a3b8;        /* טקסט משני/עמום */
-    
-    /* צבעי מותג ואקשן */
-    --accent-color: #38bdf8;      /* כחול בהיר זוהר (פוקוס וכפתורים ראשיים) */
-    --accent-hover: #0ea5e9;      /* כחול בהיר כהה יותר בריחופים */
-    
-    /* צבעי רמות סיכון וסטטוסים (לפי הקוד שלך) */
-    --risk-high-bg: rgba(239, 68, 68, 0.15);
-    --risk-high-text: #f87171;
-    --risk-medium-bg: rgba(245, 158, 11, 0.15);
-    --risk-medium-text: #fbbf24;
-    --risk-low-bg: rgba(34, 197, 94, 0.15);
-    --risk-low-text: #4ade80;
-
-    --border-color: #475569;
-    --border-radius: 8px;
-    --transition-speed: 0.25s;
+  /* רקעים בהירים ונקיים באווירה משטרתית */
+  --bg:           #f1f5f9; 
+  --bg-panel:     #ffffff;
+  --bg-card:      #ffffff;
+  --bg-input:     #f8fafc;
+  --bg-row-hover: #f0f7ff; 
+  --surface-2:    #f8fafc;
+  
+  /* גבולות עדינים */
+  --border:       #e2e8f0;
+  --border-mid:   #cbd5e1;
+  --border-light: #94a3b8;
+  
+  /* כחול משטרתי (Police Blue) */
+  --accent:       #1d4ed8; 
+  --accent-dim:   rgba(29, 78, 216, 0.08);
+  --accent-hover: #1e3a8a;
+  
+  /* טקסטים כהים וקריאים */
+  --text-primary: #0f172a;
+  --text-muted:   #475569;
+  --text-dim:     #64748b;
+  --text-inv:     #ffffff;
+  
+  /* צבעי סטטוס וסיכון (מותאמים לרקע בהיר) */
+  --risk-low:     #16a34a;
+  --risk-med:     #d97706;
+  --risk-high:    #dc2626;
+  --risk-ext:     #9333ea;
+  --danger:       #dc2626;
+  --online:       #16a34a;
+  
+  /* עיצוב כללי */
+  --radius-sm:    5px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg:    0 8px 32px rgba(15, 23, 42, 0.08);
+  --transition:   0.15s ease;
 }
 
-/* ==========================================================================
-   2. איפוס והגדרות בסיס (Base Reset)
-   ========================================================================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    padding: 40px 20px;
-    min-height: 100vh;
-    direction: ltr; /* המערכת מבוססת אנגלית */
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* אפקט גלילה מעוצב */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: var(--bg-main);
-}
-::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: var(--text-muted);
-}
+.screen { animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-/* ==========================================================================
-   3. ניהול מסכים וראוטינג (App Router Navigation)
-   ========================================================================== */
-#login-screen, 
-#register-screen, 
-#dashboard-screen {
-    display: none; /* נשלט דינמית על ידי AppRouter */
-    opacity: 0;
-    transform: translateY(10px);
-    animation: screenAppear var(--transition-speed) ease-out forwards;
-}
-
-@keyframes screenAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ==========================================================================
-   4. מסכי התחברות והרשמה (Auth Screens UI)
-   ========================================================================== */
-#login-screen, 
+/* ══ AUTH ══ */
+#login-screen,
 #register-screen {
-    max-width: 420px;
-    margin: 60px auto;
-    background-color: var(--bg-card);
-    padding: 40px;
-    border-radius: calc(var(--border-radius) * 2);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 0%, rgba(29, 78, 216, 0.06) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 80% 85%, rgba(29, 78, 216, 0.04) 0%, transparent 55%),
+    var(--bg);
 }
 
-#login-screen h2, 
+#login-screen > *,
+#register-screen > * {
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#login-screen h2,
 #register-screen h2 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-main);
-    letter-spacing: -0.5px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+#login-screen h2::after,
+#register-screen h2::after {
+  content: 'Authorized Personnel Only';
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-#login-screen p, 
-#register-screen p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 24px;
+#login-screen > div,
+#register-screen > div {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px 36px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-lg);
 }
 
-/* קישורים למעבר בין מסכים */
-.auth-switch-link {
-    display: inline-block;
-    margin-top: 16px;
-    color: var(--accent-color);
-    font-size: 14px;
-    text-decoration: none;
-    transition: color var(--transition-speed);
+#login-screen label,
+#register-screen label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+  margin-top: 18px;
+  letter-spacing: 0.2px;
 }
-.auth-switch-link:hover {
-    text-decoration: underline;
-    color: var(--accent-hover);
-}
+#login-screen div:first-of-type label,
+#register-screen div:first-of-type label { margin-top: 0; }
 
-/* ==========================================================================
-   5. מסך לוח הבקרה (Dashboard Screen UI)
-   ========================================================================== */
-#dashboard-screen {
-    max-width: 1300px;
-    margin: 0 auto;
-    background-color: var(--bg-card);
-    padding: 32px;
-    border-radius: calc(var(--border-radius) * 1.5);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* כותרת הדשבורד */
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
-    margin-bottom: 32px;
-}
-
-.dashboard-header h1 {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    background: linear-gradient(to right, var(--text-main), var(--text-muted));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* ==========================================================================
-   6. שדות קלט, טפסים ובחירה (Inputs & Forms Control)
-   ========================================================================== */
-/* שדות אינפוט וסלקט כלליים */
 input[type="text"],
 input[type="password"],
 select,
 textarea {
-    width: 100%;
-    background-color: var(--bg-input);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 12px 16px;
-    font-size: 14px;
-    border-radius: var(--border-radius);
-    transition: all var(--transition-speed);
-    outline: none;
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  padding: 10px 13px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+  background: #ffffff;
+}
+input::placeholder { color: var(--text-dim); }
+
+select {
+  appearance: none;
+  cursor: pointer;
+  /* חץ כהה מותאם לרקע בהיר */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23475569' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+  background-color: var(--bg-input);
+}
+select option { background: var(--bg-panel); color: var(--text-primary); }
+
+#login-btn,
+#register-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 24px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 11px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+}
+#login-btn:hover,
+#register-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+}
+#login-btn:active,
+#register-btn:active { transform: translateY(0); }
+
+#login-screen > p,
+#register-screen > p {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 16px;
+}
+#login-screen a,
+#register-screen a { color: var(--accent); text-decoration: none; font-weight: 500; }
+#login-screen a:hover,
+#register-screen a:hover { text-decoration: underline; }
+
+/* ══ DASHBOARD ══ */
+#dashboard-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-input:focus, 
-select:focus, 
-textarea:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 60px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
 
-/* אזור הסינון והחיפוש (לפי האלמנטים ב-fugitive-ui.js) */
-.search-filter-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
+.dashboard-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.1px;
+}
+.dashboard-header h2::before {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--online);
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+  animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2); }
+  50%       { box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.1); }
 }
 
-#search-input {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: 12px center;
-    background-size: 18px;
-    padding-left: 42px;
+.user-controls { display: flex; align-items: center; gap: 16px; }
+#welcome-msg {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
 }
 
-/* אזור הוספת מבוקש חדש (טופס רישום פושע) */
-.add-fugitive-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    background-color: rgba(15, 23, 42, 0.4);
-    padding: 24px;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    margin-bottom: 32px;
-    align-items: flex-end;
+.dashboard-content {
+  flex: 1;
+  padding: 24px 28px;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
 }
 
-/* כותרת קטנה מעל שדות הטופס */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
 }
 
-.form-group label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-muted);
+/* ── Panels ── */
+.control-panel,
+.data-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
-/* ==========================================================================
-   7. כפתורים (Buttons Control)
-   ========================================================================== */
-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--accent-color);
-    color: var(--bg-main);
-    font-weight: 600;
-    font-size: 14px;
-    padding: 12px 24px;
-    border: none;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all var(--transition-speed);
+.control-panel h3,
+.data-panel h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  letter-spacing: -0.1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.control-panel h3::before,
+.data-panel h3::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
-button:hover {
-    background-color: var(--accent-hover);
-    transform: translateY(-1px);
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid .full-width { grid-column: 1 / -1; }
+.form-grid label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
 }
 
-button:active {
-    transform: translateY(0);
+button { cursor: pointer; transition: all var(--transition); }
+
+.primary-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(29, 78, 216, 0.25);
+}
+.primary-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
 }
 
-/* כפתורי פעולה בתוך הטבלה (Action Buttons) */
-.action-btn {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 4px;
-    font-weight: 500;
-    margin-right: 6px;
+.danger-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+.danger-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+  background: rgba(220, 38, 38, 0.05);
 }
 
-/* כפתור עריכה (Edit) - צהוב/אורנג' טקטי */
-.edit-btn {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.3);
+/* ── Table ── */
+.table-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
 }
-.edit-btn:hover {
-    background-color: #f59e0b;
-    color: #0f172a;
-}
+.table-controls h3 { margin-bottom: 0; }
 
-/* כפתור מחיקה (Delete) - אדום מלחמתי */
-.delete-btn {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-.delete-btn:hover {
-    background-color: #ef4444;
-    color: #white;
-}
+.filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.filters label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.filters input,
+.filters select { width: auto; min-width: 160px; font-size: 13px; padding: 8px 12px; }
+.filters select { min-width: 140px; }
 
-/* ==========================================================================
-   8. טבלת מבוקשים (Fugitives Intelligence Table)
-   ========================================================================== */
 .table-container {
-    width: 100%;
-    overflow-x: auto;
-    border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 14px;
+table { width: 100%; border-collapse: collapse; }
+
+thead tr { background: var(--surface-2); }
+thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
-th {
-    background-color: #1e293b;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    padding: 16px;
-    border-bottom: 2px solid var(--border-color);
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+tbody tr:hover { background: var(--bg-row-hover); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+tbody td:first-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+tbody td strong { font-weight: 600; }
+tbody td[colspan] {
+  text-align: center;
+  color: var(--text-dim);
+  padding: 48px;
+  font-size: 14px;
 }
 
-td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-main);
-    background-color: rgba(30, 41, 59, 0.2);
+/* ── Risk badges ── */
+[class^="risk-"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+[class^="risk-"]::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-tr:last-child td {
-    border-bottom: none;
+.risk-low     { background: rgba(22, 163, 74, 0.1);  color: #15803d; border: 1px solid rgba(22, 163, 74, 0.2); }
+.risk-low::before     { background: #16a34a; }
+.risk-medium  { background: rgba(217, 119, 6, 0.1); color: #b45309; border: 1px solid rgba(217, 119, 6, 0.2); }
+.risk-medium::before  { background: #d97706; }
+.risk-high    { background: rgba(220, 38, 38, 0.1);  color: #b91c1c; border: 1px solid rgba(220, 38, 38, 0.2); }
+.risk-high::before    { background: #dc2626; }
+.risk-extreme { background: rgba(147, 51, 234, 0.1); color: #7e22ce; border: 1px solid rgba(147, 51, 234, 0.2); animation: extPulse 2.5s ease-in-out infinite; }
+.risk-extreme::before { background: #9333ea; }
+@keyframes extPulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 8px rgba(147, 51, 234, 0.3); }
 }
 
-tr:hover td {
-    background-color: rgba(51, 65, 85, 0.4);
+/* ── Action buttons ── */
+.action-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+  margin-right: 6px;
+  background: #ffffff;
+}
+.edit-btn   { border-color: var(--border-mid); color: var(--text-muted); }
+.edit-btn:hover   { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.delete-btn { border-color: var(--border-mid); color: var(--text-muted); }
+.delete-btn:hover { border-color: var(--danger); color: var(--danger); background: rgba(220, 38, 38, 0.08); }
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .dashboard-content { padding: 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full-width { grid-column: 1; }
+  .table-controls { flex-direction: column; align-items: flex-start; }
+  .dashboard-header { padding: 0 16px; }
+  #login-screen > div, #register-screen > div { padding: 24px 20px; }
 }
 
-/* ==========================================================================
-   9. תגיות רמות סיכון דינמיות (Risk Levels Pill Badges)
-   ========================================================================== */
-/* מנוהל ב-JS באמצעות ה-Class הדינמי: .risk-high, .risk-medium, .risk-low */
-.risk-high, 
-.risk-medium, 
-.risk-low {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.risk-high {
-    background-color: var(--risk-high-bg);
-    color: var(--risk-high-text);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.risk-medium {
-    background-color: var(--risk-medium-bg);
-    color: var(--risk-medium-text);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.risk-low {
-    background-color: var(--risk-low-bg);
-    color: var(--risk-low-text);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
