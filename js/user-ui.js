@@ -1,8 +1,14 @@
 class UserUI {
-    constructor() {
+   constructor() {
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
+        if (loginBtn) {
+            loginBtn.addEventListener('click', () => this.handleLogin());
+        }
+        if (registerBtn) {
+            registerBtn.addEventListener('click', () => this.handleRegister());
+        }
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 sessionStorage.removeItem('currentUser');
@@ -11,15 +17,6 @@ class UserUI {
                     fugitiveUI._renderTable([]);
                     fugitiveUI._clearAddForm();
                 }
-                router.navigateTo('#login');
-            });
-        }
-        if (registerBtn) {
-            registerBtn.addEventListener('click', () => this.handleRegister());
-        }
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                sessionStorage.removeItem('currentUser');
                 router.navigateTo('#login');
             });
         }

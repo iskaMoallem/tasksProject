@@ -26,7 +26,7 @@ class Network {
             const finalResponse = JSON.parse(stringifiedResponse);
             xhrObject.status = finalResponse.status;
             xhrObject.responseText = stringifiedResponse;
-                xhrObject.onload();
+            xhrObject.onload();
         }, delay);
     }
 
@@ -36,7 +36,6 @@ class Network {
             endPoint: xhrObject.endPoint,
             body: xhrObject.body
         });
-
         if (xhrObject.endPoint.startsWith('/api/users')) {
             return this.userServer.handleRequest(requestString);
         }

@@ -1,4 +1,3 @@
-
 class UserDbApi {
     constructor() {
         if (!localStorage.getItem('users')) {

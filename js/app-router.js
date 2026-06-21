@@ -9,36 +9,47 @@ class AppRouter {
         this.screens.forEach(screenId => {
             const screenElement = document.getElementById(screenId);
             if (screenElement) {
-                if (screenId === screenIdToShow) {
-                    screenElement.style.display = 'block';
-                } else {
-                    screenElement.style.display = 'none';
-                }
+                screenElement.style.display = (screenId === screenIdToShow) ? 'block' : 'none';
             }
         });
     }
 
     handleRoute() {
         const currentHash = window.location.hash;
-        if (currentHash === '' || currentHash === '#login') {
-            this._showScreen('login-screen');
-        }
-        else if (currentHash === '#register') {
-            this._showScreen('register-screen');
-        }
-        else if (currentHash === '#dashboard') {
-            const loggedInUser = sessionStorage.getItem('currentUser');
-            if (loggedInUser) {
-                const parsedUser = JSON.parse(loggedInUser);
-                document.getElementById('welcome-msg').innerText = "Welcome, Officer " + parsedUser.userName;
-                this._showScreen('dashboard-screen');
-                fugitiveUI.loadAllFugitives();
-            } else {
-                alert("Unauthorized access. Please login first.");
+        switch (currentHash) {
+            case '':
+            case '#login':
+                this._handleLogin();
+                break;
+            case '#register':
+                this._handleRegister();
+                break;
+            case '#dashboard':
+                this._handleDashboard();
+                break;
+            default:
                 this.navigateTo('#login');
-            }
+                break;
         }
-        else {
+    }
+
+    _handleLogin() {
+        this._showScreen('login-screen');
+    }
+
+    _handleRegister() {
+        this._showScreen('register-screen');
+    }
+
+    _handleDashboard() {
+        const loggedInUser = sessionStorage.getItem('currentUser');
+        if (loggedInUser) {
+            const parsedUser = JSON.parse(loggedInUser);
+            document.getElementById('welcome-msg').innerText = "Welcome, Officer " + parsedUser.userName;
+            this._showScreen('dashboard-screen');
+            fugitiveUI.loadAllFugitives();
+        } else {
+            alert("Unauthorized access. Please login first.");
             this.navigateTo('#login');
         }
     }
@@ -46,7 +57,6 @@ class AppRouter {
     navigateTo(hashUrl) {
         window.location.hash = hashUrl;
     }
-
 }
 
 const router = new AppRouter();

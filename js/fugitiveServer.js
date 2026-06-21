@@ -24,6 +24,7 @@ class FugitiveServer {
         if (this._checkIfExists(id)) {
             return JSON.stringify({ status: 409, message: "Fugitive ID already exists" });
         }
+
         const newFugitive = new Fugitive(id, name, description, riskLevel, status, creatorOfficerId);
         this.dbApi.insertFugitive(newFugitive);
         return JSON.stringify({
@@ -35,12 +36,6 @@ class FugitiveServer {
 
     _updateFugitive(body) {
         const { id, name, description, riskLevel, status, relatedOfficerIds } = body;
-        if (!id) {
-            return JSON.stringify({ status: 400, message: "ID is required for update" });
-        }
-        if (!this._checkIfExists(id)) {
-            return JSON.stringify({ status: 404, message: "Fugitive not found" });
-        }
         const updatedFugitive = { id, name, description, riskLevel, status, relatedOfficerIds };
         this.dbApi.updateFugitive(updatedFugitive);
         return JSON.stringify({
@@ -52,12 +47,6 @@ class FugitiveServer {
 
     _deleteFugitive(body) {
         const { id } = body;
-        if (!id) {
-            return JSON.stringify({ status: 400, message: "ID is required for deletion" });
-        }
-        if (!this._checkIfExists(id)) {
-            return JSON.stringify({ status: 404, message: "Fugitive not found" });
-        }
         this.dbApi.deleteFugitive(id);
         return JSON.stringify({
             status: 200,
