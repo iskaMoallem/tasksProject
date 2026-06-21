@@ -100,24 +100,29 @@ class FugitiveUI {
         this.editingId = null;
         document.getElementById('add-fugitive-btn').innerText = "Add Fugitive";
     }
-
     handleAddFugitive() {
         const newData = this._getNewFugitiveInputs();
+
         if (!newData.id || !newData.name) {
             alert("Error: Fugitive ID and Name are required.");
             return;
         }
+
         if (this.editingId) {
             const oldFugitive = this.fugitivesList.find(f => f.id === this.editingId);
+
             if (oldFugitive && oldFugitive.status === 'Deceased' && newData.status !== 'Deceased') {
                 alert("Error: A deceased fugitive cannot be brought back to active status.");
                 return;
             }
-
             newData.relatedOfficerIds = oldFugitive.relatedOfficerIds;
+            const loggedInUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (loggedInUser && !newData.relatedOfficerIds.includes(loggedInUser.id)) {
+                newData.relatedOfficerIds.push(loggedInUser.id);
+            }
             this._sendUpdateRequest(newData);
-
-        } else {
+        }
+        else {
             const loggedInUser = JSON.parse(sessionStorage.getItem('currentUser'));
             if (loggedInUser) newData.creatorOfficerId = loggedInUser.id;
             this._sendAddRequest(newData);

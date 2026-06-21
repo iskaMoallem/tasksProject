@@ -3,8 +3,16 @@ class UserUI {
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => this.handleLogin());
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                if (typeof fugitiveUI !== 'undefined') {
+                    fugitiveUI.fugitivesList = [];
+                    fugitiveUI._renderTable([]);
+                    fugitiveUI._clearAddForm();
+                }
+                router.navigateTo('#login');
+            });
         }
         if (registerBtn) {
             registerBtn.addEventListener('click', () => this.handleRegister());
@@ -44,11 +52,10 @@ class UserUI {
     }
 
     _processSuccessfulLogin(userData) {
-        document.getElementById('welcome-msg').innerText = `Welcome, ${userData.username}`;
         this._clearInputs(['login-id', 'login-pass']);
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
-        alert("Welcome back, " + userData.userName + "!");
         router.navigateTo('#dashboard');
+        setTimeout(() => alert("Welcome back, " + userData.userName + "!"), 50);
     }
 
     _onLoginResponse(xhr) {
@@ -96,9 +103,9 @@ class UserUI {
 
     _processSuccessfulRegistration(userData) {
         this._clearInputs(['reg-id', 'reg-name', 'reg-pass']);
-        alert("Registration successful!");
         sessionStorage.setItem('currentUser', JSON.stringify(userData));
         router.navigateTo('#dashboard');
+        setTimeout(() => alert("Registration successful!"), 50);
     }
 
     _onRegisterResponse(xhr) {

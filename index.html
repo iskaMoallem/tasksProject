@@ -92,33 +92,34 @@
             <hr>
 
             <section class="data-panel">
-               
+
                 <div class="filters">
-                        <label>Search:</label>
-                        <input type="text" id="search-input" placeholder="Search by name...">
+                    <label>Search:</label>
+                    <input type="text" id="search-input" placeholder="Search by name...">
 
-                        <label>Status:</label>
-                        <select id="filter-status-select">
-                            <option value="All">All</option>
-                            <option value="At Large">At Large</option>
-                            <option value="In Custody">In Custody</option>
-                            <option value="Deceased">Deceased</option>
-                        </select>
+                    <label>Status:</label>
+                    <select id="filter-status-select">
+                        <option value="All">All</option>
+                        <option value="At Large">At Large</option>
+                        <option value="In Custody">In Custody</option>
+                        <option value="Deceased">Deceased</option>
+                    </select>
 
-                        <label>Risk Level:</label>
-                        <select id="filter-risk-select">
-                            <option value="All">All</option>
-                            <option value="Low">Low</option>
-                            <option value="Medium">Medium</option>
-                            <option value="High">High</option>
-                            <option value="Extreme">Extreme</option>
-                        </select>
+                    <label>Risk Level:</label>
+                    <select id="filter-risk-select">
+                        <option value="All">All</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Extreme">Extreme</option>
+                    </select>
 
-                        <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; margin-left: 10px;">
-                            <input type="checkbox" id="filter-my-fugitives" style="width: auto; min-width: auto; cursor: pointer;">
-                            My Fugitives Only
-                        </label>
-                    </div>
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; margin-left: 10px;">
+                        <input type="checkbox" id="filter-my-fugitives"
+                            style="width: auto; min-width: auto; cursor: pointer;">
+                        My Fugitives Only
+                    </label>
+                </div>
 
                 <div class="table-container">
                     <table id="fugitives-table">
@@ -140,21 +141,17 @@
 
         </div>
     </div>
+    <script src="js/User.js"></script>
+    <script src="js/fugitive.js"></script>
+    <script src="js/user_DB-Api.js"></script>
+    <script src="js/Fugitive_DB-Api.js"></script>
+    <script src="js/usersServer.js"></script>
+    <script src="js/fugitiveServer.js"></script>
+    <script src="js/fajaxHttpRequest.js"></script>
+    <script src="js/network.js"></script>
+    <script src="js/app-router.js"></script>
+    <script src="js/user-ui.js"></script>
+    <script src="js/fugitive-ui.js"></script>
 </body>
 
-<script src="js/User.js"></script>
-<script src="js/fugitive.js"></script>
-
-<script src="js/user_DB-Api.js"></script>
-<script src="js/Fugitive_DB-Api.js"></script>
-
-<script src="js/usersServer.js"></script>
-<script src="js/fugitiveServer.js"></script>
-
-<script src="js/fajaxHttpRequest.js"></script>
-<script src="js/network.js"></script>
-
-<script src="js/app-router.js"></script>
-<script src="js/user-ui.js"></script>
-<script src="js/fugitive-ui.js"></script>
 </html>
