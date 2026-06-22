@@ -21,12 +21,11 @@ class FugitiveServer {
         if (!id || !name || !creatorOfficerId) {
             return JSON.stringify({ status: 400, message: "ID, Name, and Creator Officer ID are required" });
         }
-        if (this._checkIfExists(id)) {
-            return JSON.stringify({ status: 409, message: "Fugitive ID already exists" });
-        }
-
         const newFugitive = new Fugitive(id, name, description, riskLevel, status, creatorOfficerId);
-        this.dbApi.insertFugitive(newFugitive);
+        const dbResponse = this.dbApi.insertFugitive(newFugitive);
+        if (!dbResponse.success) {
+            return JSON.stringify({ status: 409, message: dbResponse.error });
+        }
         return JSON.stringify({
             status: 201,
             message: "Fugitive added successfully",
@@ -55,19 +54,24 @@ class FugitiveServer {
     }
 
     handleRequest(fajaxRequestString) {
-        const request = JSON.parse(fajaxRequestString);
-        if (request.method === 'GET' && request.endPoint === '/api/fugitives/all') {
-            return this._getAllFugitives();
+        try {
+            const request = JSON.parse(fajaxRequestString);
+            if (request.method === 'GET' && request.endPoint === '/api/fugitives/all') {
+                return this._getAllFugitives();
+            }
+            if (request.method === 'POST' && request.endPoint === '/api/fugitives/add') {
+                return this._addFugitive(request.body);
+            }
+            if (request.method === 'PUT' && request.endPoint === '/api/fugitives/update') {
+                return this._updateFugitive(request.body);
+            }
+            if (request.method === 'DELETE' && request.endPoint === '/api/fugitives/delete') {
+                return this._deleteFugitive(request.body);
+            }
+            return JSON.stringify({ status: 404, message: "EndPoint not found" });
         }
-        if (request.method === 'POST' && request.endPoint === '/api/fugitives/add') {
-            return this._addFugitive(request.body);
+        catch (error) {
+            return JSON.stringify({ status: 500, message: "Internet server error: Bad request format" });
         }
-        if (request.method === 'PUT' && request.endPoint === '/api/fugitives/update') {
-            return this._updateFugitive(request.body);
-        }
-        if (request.method === 'DELETE' && request.endPoint === '/api/fugitives/delete') {
-            return this._deleteFugitive(request.body);
-        }
-        return JSON.stringify({ status: 404, message: "EndPoint not found" });
     }
 }

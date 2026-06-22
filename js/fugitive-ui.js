@@ -72,10 +72,10 @@ class FugitiveUI {
         xhr.onerror = () => alert("Network Error while adding fugitive.");
         xhr.send(newData);
     }
+
     _sendUpdateRequest(updatedData) {
         const xhr = new FXMLHttpRequest();
         xhr.open('PUT', '/api/fugitives/update');
-
         xhr.onload = () => {
             if (xhr.status === 200) {
                 const index = this.fugitivesList.findIndex(f => f.id === updatedData.id);
@@ -86,8 +86,12 @@ class FugitiveUI {
                 this._resetFormState();
                 alert("Fugitive updated successfully.");
             } else {
-                const response = JSON.parse(xhr.responseText);
-                alert("Failed to update: " + response.message);
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    alert("Failed to update: " + response.message);
+                } catch (e) {
+                    alert("System Error: Bad response from server.");
+                }
             }
         };
         xhr.onerror = () => alert("Network Error while updating.");
@@ -100,6 +104,7 @@ class FugitiveUI {
         this.editingId = null;
         document.getElementById('add-fugitive-btn').innerText = "Add Fugitive";
     }
+
     handleAddFugitive() {
         const newData = this._getNewFugitiveInputs();
 
@@ -139,12 +144,16 @@ class FugitiveUI {
     }
 
     _onLoadFugitivesResponse(xhr) {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 200) {
-            this.fugitivesList = response.data;
-            this._renderTable(this.fugitivesList);
-        } else {
-            alert("Error loading data: " + response.message);
+        try {
+            const response = JSON.parse(xhr.responseText);
+            if (xhr.status === 200) {
+                this.fugitivesList = response.data;
+                this._renderTable(this.fugitivesList);
+            } else {
+                alert("Error loading data: " + response.message);
+            }
+        } catch (e) {
+            alert("System Error: Failed to parse fugitives data.");
         }
     }
 
@@ -184,8 +193,12 @@ class FugitiveUI {
                 this.fugitivesList = this.fugitivesList.filter(f => f.id !== fugitiveId);
                 this._applyFilters();
             } else {
-                const response = JSON.parse(xhr.responseText);
-                alert("Failed to delete: " + response.message);
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    alert("Failed to delete: " + response.message);
+                } catch (e) {
+                    alert("System Error: Bad response from server.");
+                }
             }
         };
         xhr.onerror = () => alert("Network Error while deleting.");

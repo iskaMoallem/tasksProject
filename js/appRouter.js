@@ -2,7 +2,7 @@ class AppRouter {
     constructor() {
         this.screens = ['login-screen', 'register-screen', 'dashboard-screen'];
         window.addEventListener('load', () => this.handleRoute());
-        window.addEventListener('hashchange', () => this.handleRoute());
+        window.addEventListener('popstate', () => this.handleRoute());
     }
 
     _showScreen(screenIdToShow) {
@@ -34,11 +34,23 @@ class AppRouter {
     }
 
     _handleLogin() {
-        this._showScreen('login-screen');
+        const loggedInUser = sessionStorage.getItem('currentUser');
+        if (loggedInUser) {
+            this.navigateTo('#dashboard');
+        }
+        else {
+            this._showScreen('login-screen');
+        }
     }
 
     _handleRegister() {
-        this._showScreen('register-screen');
+        const loggedInUser = sessionStorage.getItem('currentUser');
+        if (loggedInUser) {
+            this.navigateTo('#dashboard');
+        }
+        else {
+            this._showScreen('register-screen');
+        }
     }
 
     _handleDashboard() {
@@ -55,7 +67,8 @@ class AppRouter {
     }
 
     navigateTo(hashUrl) {
-        window.location.hash = hashUrl;
+        window.history.pushState({}, '', hashUrl);
+        this.handleRoute();
     }
 }
 

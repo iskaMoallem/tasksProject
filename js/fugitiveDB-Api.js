@@ -25,8 +25,13 @@ class FugitiveDbApi {
 
     insertFugitive(fugitiveObject) {
         const fugitives = this._getData();
+        const existingFugitive = fugitives.find(f => f.id === fugitiveObject.id);
+        if (existingFugitive) {
+            return { success: false, error: "Fugitive ID already exists" };
+        }
         fugitives.push(fugitiveObject);
         this._setData(fugitives);
+        return { success: true, data: fugitiveObject };
     }
 
     updateFugitive(updatedFugitive) {

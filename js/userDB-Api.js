@@ -22,8 +22,12 @@ class UserDbApi {
 
     insertUser(userObject) {
         const users = this._getData();
+        const existingUser = users.find(user => user.id === userObject.id);
+        if (existingUser) {
+            return { success: false, error: "ID is already taken" };
+        }
         users.push(userObject);
         this._setData(users);
-        return userObject;
+        return { success: true, data: userObject };
     }
 }

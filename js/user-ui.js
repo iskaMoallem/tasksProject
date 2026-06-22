@@ -1,5 +1,5 @@
 class UserUI {
-   constructor() {
+    constructor() {
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
@@ -56,14 +56,17 @@ class UserUI {
     }
 
     _onLoginResponse(xhr) {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 200) {
-            this._processSuccessfulLogin(response.data);
-        } else {
-            alert("Login Failed: " + response.message);
+        try {
+            const response = JSON.parse(xhr.responseText);
+            if (xhr.status === 200) {
+                this._processSuccessfulLogin(response.data);
+            } else {
+                alert("Login Failed: " + response.message);
+            }
+        } catch (error) {
+            alert("System Error: Received unexpected data from the server.");
         }
     }
-
     _sendLoginRequest(credentials) {
         const xhr = new FXMLHttpRequest();
         xhr.open('POST', '/api/users/login');
@@ -106,11 +109,16 @@ class UserUI {
     }
 
     _onRegisterResponse(xhr) {
-        const response = JSON.parse(xhr.responseText);
-        if (xhr.status === 201) {
-            this._processSuccessfulRegistration(response.data);
-        } else {
-            alert("Registration Failed: " + response.message);
+        try {
+            const response = JSON.parse(xhr.responseText);
+            if (xhr.status === 201) {
+                this._processSuccessfulRegistration(response.data);
+            } else {
+                alert("Registration Failed: " + response.message);
+            }
+        }
+        catch (error) {
+            alert("System Error: Received unexpected data from the server.");
         }
     }
 

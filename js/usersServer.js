@@ -20,26 +20,30 @@ class UserServer {
         if (!id || !userName || !password) {
             return JSON.stringify({ status: 400, message: "ID, Username and password are required" });
         }
-        const existingUser = this.dbApi.getUserById(id);
-        if (existingUser) {
-            return JSON.stringify({ status: 409, message: "ID is already taken" });
-        }
         const newUser = new User(id, userName, password);
-        this.dbApi.insertUser(newUser);
+        const dbResponse = this.dbApi.insertUser(newUser);
+        if (!dbResponse.success) {
+            return JSON.stringify({ status: 409, message: dbResponse.error });
+        }
         return JSON.stringify({
-            status: 201, message: "Registration was successful.", data: { id: newUser.id, userName: newUser.userName }
+            status: 201,
+            message: "Registration was successful.",
+            data: { id: newUser.id, userName: newUser.userName }
         });
     }
-
     handleRequest(fajaxRequestString) {
-        const request = JSON.parse(fajaxRequestString);
-        if (request.method === 'POST' && request.endPoint === '/api/users/login') {
-            return this._login(request.body);
+        try {
+            const request = JSON.parse(fajaxRequestString);
+            if (request.method === 'POST' && request.endPoint === '/api/users/login') {
+                return this._login(request.body);
+            }
+            if (request.method === 'POST' && request.endPoint === '/api/users/register') {
+                return this._register(request.body);
+            }
+            return JSON.stringify({ status: 404, message: "EndPoint not found" });
         }
-        if (request.method === 'POST' && request.endPoint === '/api/users/register') {
-            return this._register(request.body);
+        catch (error) {
+            return JSON.stringify({ status: 500, message: "Internet server error: Bad request format" });
         }
-        return JSON.stringify({ status: 404, message: "EndPoint not found" });
     }
-
 }
