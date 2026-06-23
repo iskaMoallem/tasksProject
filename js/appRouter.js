@@ -4,7 +4,7 @@ class AppRouter {
         window.addEventListener('load', () => this.handleRoute());
         window.addEventListener('popstate', () => this.handleRoute());
     }
-
+ 
     _showScreen(screenIdToShow) {
         this.screens.forEach(screenId => {
             const screenElement = document.getElementById(screenId);
